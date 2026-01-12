@@ -1,12 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 
 from app.db.session import get_db
 from app.api.deps import get_current_user
-from app.models.task import Task
 from app.models.user import User
 from app.schemas.task import TaskCreate, TaskOut
+from app.services.tasks import TasksService
 
 router = APIRouter()
 
@@ -17,11 +16,7 @@ async def create_task(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    task = Task(title=payload.title, owner_id=user.id)
-    db.add(task)
-    await db.commit()
-    await db.refresh(task)
-    return task
+    return await TasksService(db).create_task(title=payload.title, owner_id=user.id)
 
 
 @router.get("/", response_model=list[TaskOut])
@@ -29,8 +24,7 @@ async def my_tasks(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    q = await db.execute(select(Task).where(Task.owner_id == user.id))
-    return q.scalars().all()
+    return await TasksService(db).list_my_tasks(owner_id=user.id)
 
 
 @router.delete("/{task_id}")
@@ -39,11 +33,5 @@ async def delete_task(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    q = await db.execute(select(Task).where(Task.id == task_id))
-    task = q.scalar_one_or_none()
-    if not task or task.owner_id != user.id:
-        raise HTTPException(status_code=404, detail="Task not found")
-
-    await db.delete(task)
-    await db.commit()
+    await TasksService(db).delete_my_task(task_id=task_id, owner_id=user.id)
     return {"ok": True}
