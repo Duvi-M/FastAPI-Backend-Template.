@@ -63,6 +63,7 @@ This project demonstrates how to design, build, and run a modern backend API usi
 ├── requirements-dev.txt
 ├── .env.example
 └── README.md
+``` 
 
 ## 🧠 Architecture Overview
 
