@@ -303,7 +303,7 @@ Recommended coverage:
 
 Run linters and type checks:
 ```bash
-ruff check .
+ruff check 
 mypy app/
 ```
 
