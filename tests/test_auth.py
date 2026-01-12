@@ -1,4 +1,3 @@
-import os
 import pytest
 
 @pytest.mark.asyncio
