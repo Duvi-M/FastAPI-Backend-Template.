@@ -14,13 +14,14 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from app.core.config import settings
 from app.db.base import Base
+import app.models  # noqa: F401
 
 # this is the Alembic Config object, which provides access to the values within the .ini file.
 config = context.config
 
 # Interpret the config file for Python logging.
-if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+# if config.config_file_name is not None:
+    # fileConfig(config.config_file_name)
 
 target_metadata = Base.metadata
 
